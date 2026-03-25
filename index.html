@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPL Playing XI Builder</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-area">
+                <i class="fa-solid fa-trophy header-icon"></i>
+                <h1>XI BUILDER</h1>
+            </div>
+            <div class="team-selector-container">
+                <select id="team-selector" class="team-dropdown">
+                    <option value="" disabled selected>Select IPL Team</option>
+                    <!-- Options populated via JS -->
+                </select>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="workspace">
+            <!-- Left Column: Available Squad -->
+            <section class="panel squad-panel">
+                <div class="panel-header">
+                    <h2>Available Squad</h2>
+                    <span class="badge" id="squad-count">0 Players</span>
+                </div>
+                <!-- Search bar (Optional addition) -->
+                <div class="search-bar">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" id="player-search" placeholder="Search players...">
+                </div>
+                <!-- The player pool where draggable items live -->
+                <div class="player-list" id="available-players" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <!-- Player Cards inserted via JS -->
+                    <div class="empty-state" id="squad-empty-state">
+                        <i class="fa-solid fa-users icon-large"></i>
+                        <p>Select a team to view players</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Column: The Pitch (Playing XI) -->
+            <section class="panel pitch-panel">
+                <div class="panel-header pitch-header">
+                    <h2 id="active-team-name">Playing XI</h2>
+                    <div class="stats-container">
+                        <div class="stat-badge" id="player-count">
+                            <i class="fa-solid fa-user-group"></i> <span id="xi-count">0</span>/12
+                        </div>
+                        <div class="stat-badge" id="overseas-count">
+                            <i class="fa-solid fa-plane"></i> <span id="os-count">0</span>/4
+                        </div>
+                        <button id="load-xi-btn" class="btn-clear" title="Load Saved XI" style="margin-right: 5px; color: var(--text-color);">
+                            <i class="fa-solid fa-folder-open"></i>
+                        </button>
+                        <button id="save-xi-btn" class="btn-clear" title="Save Playing XI" style="margin-right: 5px; color: #4db8ff;">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                        </button>
+                        <button id="compare-btn" class="btn-clear" title="Compare XI" style="margin-right: 5px; color: #ffeb3b;">
+                            <i class="fa-solid fa-code-compare"></i>
+                        </button>
+                        <button id="clear-xi-btn" class="btn-clear" title="Clear XI">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Error Toast Container -->
+                <div id="toast-container" class="toast-container"></div>
+
+                <!-- Pitch Area Container -->
+                <div class="pitch-container">
+                    <div class="pitch" id="playing-xi" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        <!-- XI Players dropped here -->
+                        <div class="empty-pitch-state" id="pitch-empty-state">
+                            <i class="fa-solid fa-hand-pointer icon-large"></i>
+                            <p>Drag and drop players here to build your XI</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Split Compare Column -->
+            <section class="panel pitch-panel compare-panel" id="compare-panel" style="display: none;">
+                <div class="panel-header pitch-header">
+                    <h2 id="compare-team-name">Compare XI</h2>
+                </div>
+                <!-- Pitch Area Container -->
+                <div class="pitch-container">
+                    <div class="pitch compare-pitch" id="compare-playing-xi">
+                        <!-- Cloned cards go here -->
+                        <div class="empty-pitch-state">
+                            <i class="fa-solid fa-code-compare icon-large"></i>
+                            <p>Saved XI will appear here</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

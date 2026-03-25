@@ -1,0 +1,520 @@
+/* Base Variables */
+:root {
+    --bg-main: #0a0a0d;
+    --bg-panel: rgba(22, 22, 25, 0.7);
+    --bg-card: rgba(255, 255, 255, 0.05);
+    --bg-card-hover: rgba(255, 255, 255, 0.1);
+    
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0a5;
+    
+    --accent-color: #2e7aff;
+    --error-color: #ff3366;
+    --success-color: #00cc66;
+    --warning-color: #ffcc00;
+    
+    --border-color: rgba(255, 255, 255, 0.1);
+    --border-radius: 12px;
+    --card-radius: 8px;
+    
+    --team-theme: var(--accent-color);
+    --team-theme-glow: rgba(46, 122, 255, 0.2);
+    
+    --pitch-bg: #121620; /* Darker pitch color */
+    --pitch-border: #1d2331;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow: hidden;
+    background-image: 
+        radial-gradient(circle at 15% 50%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
+        radial-gradient(circle at 85% 30%, rgba(255, 255, 255, 0.02) 0%, transparent 50%);
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(10px);
+    margin-bottom: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-icon {
+    font-size: 1.5rem;
+    color: var(--team-theme);
+    text-shadow: 0 0 10px var(--team-theme-glow);
+    transition: color 0.3s ease;
+}
+
+h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Team Selector */
+.team-dropdown {
+    background: rgba(0,0,0,0.5);
+    color: white;
+    border: 1px solid var(--border-color);
+    padding: 10px 15px;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    border-radius: var(--border-radius);
+    outline: none;
+    cursor: pointer;
+    min-width: 250px;
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 15px top 50%;
+    background-size: 12px auto;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.team-dropdown:focus {
+    border-color: var(--team-theme);
+    box-shadow: 0 0 0 2px var(--team-theme-glow);
+}
+
+.team-dropdown option {
+    background: #111;
+    color: white;
+}
+
+/* Workspace Grid */
+.workspace {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 20px;
+    height: calc(100vh - 120px);
+    transition: grid-template-columns 0.3s ease;
+}
+
+.workspace.compare-active {
+    grid-template-columns: 280px 1fr 1fr;
+}
+
+.panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    display: flex;
+    flex-direction: column;
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+}
+
+.panel-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.panel-header h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.badge {
+    background: rgba(255,255,255,0.1);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Search Bar */
+.search-bar {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+}
+
+.search-bar i {
+    position: absolute;
+    left: 32px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+}
+
+.search-bar input {
+    width: 100%;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border-color);
+    padding: 10px 10px 10px 35px;
+    border-radius: var(--card-radius);
+    color: white;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.search-bar input:focus {
+    border-color: var(--team-theme);
+}
+
+/* Player Lists */
+.player-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Scrollbar Styling */
+.player-list::-webkit-scrollbar, .pitch::-webkit-scrollbar {
+    width: 6px;
+}
+.player-list::-webkit-scrollbar-track, .pitch::-webkit-scrollbar-track {
+    background: transparent;
+}
+.player-list::-webkit-scrollbar-thumb, .pitch::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+}
+
+/* Player Card Items */
+.player-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--card-radius);
+    padding: 10px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: grab;
+    transition: transform 0.2s, background 0.2s, border-color 0.2s, box-shadow 0.2s;
+    user-select: none;
+    position: relative;
+    min-width: 0;
+}
+
+.card-accent {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    border-top-left-radius: var(--card-radius);
+    border-bottom-left-radius: var(--card-radius);
+    z-index: 1;
+}
+
+.player-card:hover {
+    background: var(--bg-card-hover);
+    transform: translateY(-2px);
+    border-color: rgba(255,255,255,0.2);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.player-card:active {
+    cursor: grabbing;
+}
+
+.player-card.dragging {
+    opacity: 0.5;
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(0.98);
+}
+
+.player-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    flex: 1;
+    margin-left: 5px;
+}
+
+.player-name {
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+.player-role-text {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.player-icons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+}
+
+.role-png {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    opacity: 0.9;
+}
+
+.globe-icon {
+    font-size: 0.9rem;
+}
+
+/* Empty States */
+.empty-state, .empty-pitch-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-secondary);
+    text-align: center;
+    gap: 15px;
+    opacity: 0.6;
+}
+
+.icon-large {
+    font-size: 3rem;
+    color: rgba(255,255,255,0.1);
+}
+
+/* Pitch / Playing XI Area */
+.pitch-header {
+    background: rgba(0,0,0,0.2);
+}
+
+.stats-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.stat-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0,0,0,0.4);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid var(--border-color);
+    transition: border-color 0.3s ease, color 0.3s ease;
+}
+
+.stat-badge.error {
+    border-color: var(--error-color);
+    color: var(--error-color);
+}
+.stat-badge.success {
+    border-color: var(--success-color);
+    color: var(--success-color);
+}
+
+.btn-clear {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-clear:hover {
+    background: rgba(255, 51, 102, 0.1);
+    color: var(--error-color);
+    border-color: rgba(255, 51, 102, 0.3);
+}
+
+.pitch-container {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: var(--pitch-bg);
+    overflow: hidden;
+    position: relative;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+}
+
+/* Add grid pattern overlay for pitch area */
+.pitch-container::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: 
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+}
+
+.pitch {
+    height: 100%;
+    width: 100%;
+    background: rgba(0,0,0,0.2);
+    border: 2px dashed rgba(255,255,255,0.1);
+    border-radius: 12px;
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    transition: border-color 0.3s, background-color 0.3s;
+}
+
+.pitch-row {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.pitch-slot {
+    flex: 1 1 18%;
+    min-width: 120px;
+    min-height: 65px;
+    border: 2px dashed rgba(255, 255, 255, 0.15);
+    border-radius: var(--card-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.1);
+    position: relative;
+    transition: border-color 0.2s;
+}
+
+.pitch-slot .player-card {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+.impact-slot {
+    border-color: rgba(255,255,255,0.2) !important;
+    border-style: dashed !important;
+    flex: 1 1 20%;
+}
+
+.impact-slot .slot-label {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e2126; /* Matches standard pitch background to mask the border */
+    color: var(--text-gray);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0 8px;
+    letter-spacing: 1px;
+    z-index: 2;
+    text-transform: uppercase;
+}
+
+.pitch.drag-over {
+    border-color: var(--success-color);
+    background: rgba(0, 204, 102, 0.05);
+}
+
+/* Card actions removed */
+
+/* Toast Notification */
+.toast-container {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    width: 80%;
+    pointer-events: none;
+}
+
+.toast {
+    background: var(--error-color);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 500;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s, transform 0.3s;
+    margin-bottom: 5px;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Animations setup */
+.player-card {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.role-group-header {
+    color: var(--primary-color);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin: 15px 0 10px 10px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 5px;
+    width: 90%;
+}
