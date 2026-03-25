@@ -53,7 +53,7 @@ function getRoleIcon(role) {
         case 'Spin Bowler':
             return `<img src="PNGs/SPIN.png" class="${iconClass}" title="Spin Bowler" alt="Spin" />`;
         case 'Spin All-rounder':
-            return `<img src="PNGs/SPIN.png" class="${iconClass}" title="Spin All-rounder" alt="Spin" />`;
+            return `<img src="PNGs/BAT.png" class="${iconClass}" title="Spin All-rounder" alt="Bat" /> <img src="PNGs/SPIN.png" class="${iconClass}" title="Spin All-rounder" alt="Spin" />`;
         case 'All-rounder':
             return `<img src="PNGs/BAT.png" class="${iconClass}" title="All-rounder" alt="Bat" /> <img src="PNGs/PACE.png" class="${iconClass}" title="All-rounder" alt="Pace" />`;
         case 'Wicketkeeper':

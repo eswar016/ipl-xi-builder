@@ -263,7 +263,7 @@ const teamsData = [
             { "id": "rcb_2", "name": "Tim David", "role": "Batter", "isOverseas": true },
             { "id": "rcb_3", "name": "Virat Kohli", "role": "Batter", "isOverseas": false },
             { "id": "rcb_4", "name": "Devdutt Padikkal", "role": "Batter", "isOverseas": false },
-            { "id": "rcb_5", "name": "Jacob Bethell", "role": "All-rounder", "isOverseas": true },
+            { "id": "rcb_5", "name": "Jacob Bethell", "role": "Spin All-rounder", "isOverseas": true },
             { "id": "rcb_6", "name": "Krunal Pandya", "role": "Spin All-rounder", "isOverseas": false },
             { "id": "rcb_7", "name": "Venkatesh Iyer", "role": "All-rounder", "isOverseas": false },
             { "id": "rcb_8", "name": "Vihaan Malhotra", "role": "Spin All-rounder", "isOverseas": false },
