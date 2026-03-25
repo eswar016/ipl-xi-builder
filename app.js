@@ -24,6 +24,10 @@ const loadXiBtn = document.getElementById('load-xi-btn');
 const compareBtn = document.getElementById('compare-btn');
 const comparePanel = document.getElementById('compare-panel');
 
+// Upstash Redis Credentials
+const UPSTASH_URL = "https://legal-quail-68667.upstash.io";
+const UPSTASH_TOKEN = "gQAAAAAAAQw7AAIncDE0OTRkN2Y3ZDE5YWM0YzYxOWQyNWI4YzViMjgzNjRjYnAxNjg2Njc";
+
 let isCompareMode = false;
 
 // Initialization
@@ -45,9 +49,11 @@ function getRoleIcon(role) {
         case 'Batter':
             return `<img src="PNGs/BAT.png" class="${iconClass}" title="Batter" alt="Batter" />`;
         case 'Fast Bowler':
-            return `<img src="PNGs/PACE.png" class="${iconClass}" title="Fast Bowler" alt="Fast Bowler" />`;
+            return `<img src="PNGs/PACE.png" class="${iconClass}" title="Fast Bowler" alt="Fast" />`;
         case 'Spin Bowler':
-            return `<img src="PNGs/SPIN.png" class="${iconClass}" title="Spin Bowler" alt="Spin Bowler" />`;
+            return `<img src="PNGs/SPIN.png" class="${iconClass}" title="Spin Bowler" alt="Spin" />`;
+        case 'Spin All-rounder':
+            return `<img src="PNGs/SPIN.png" class="${iconClass}" title="Spin All-rounder" alt="Spin" />`;
         case 'All-rounder':
             return `<img src="PNGs/BAT.png" class="${iconClass}" title="All-rounder" alt="Bat" /> <img src="PNGs/PACE.png" class="${iconClass}" title="All-rounder" alt="Pace" />`;
         case 'Wicketkeeper':
@@ -161,10 +167,10 @@ function renderSquad(searchQuery = '') {
         availablePlayersContainer.innerHTML = `<div class="empty-state"><p>All players moved to XI.</p></div>`;
     } else {
         const groups = {
-            'Batters': availableSquad.filter(p => p.role === 'Batter'),
-            'All-Rounders': availableSquad.filter(p => p.role === 'All-rounder'),
-            'Wicketkeepers': availableSquad.filter(p => p.role === 'Wicketkeeper'),
-            'Bowlers': availableSquad.filter(p => p.role === 'Fast Bowler' || p.role === 'Spin Bowler')
+            'Batters': availableSquad.filter(p => p.role.includes('Batter')),
+            'Wicketkeepers': availableSquad.filter(p => p.role.includes('Wicketkeeper')),
+            'All-Rounders': availableSquad.filter(p => p.role.includes('All-rounder')),
+            'Bowlers': availableSquad.filter(p => p.role.includes('Bowler'))
         };
         
         for (const [groupName, players] of Object.entries(groups)) {
@@ -365,38 +371,83 @@ function clearXI() {
     updateStats();
 }
 
-function saveXI() {
+async function saveXI() {
     if (!currentTeam || playingXI.length === 0) {
         showToast("Nothing to save!");
         return;
     }
+    
     const playerIds = playingXI.map(p => p.id);
-    localStorage.setItem(`savedXI_${currentTeam.id}`, JSON.stringify(playerIds));
-    showToast(`Saved Playing XI for ${currentTeam.name}!`);
+    const key = `ipl_xi_builder_${currentTeam.id}`;
+    
+    try {
+        saveXiBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+        
+        const response = await fetch(`${UPSTASH_URL}/set/${key}`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${UPSTASH_TOKEN}`,
+            },
+            body: JSON.stringify(playerIds)
+        });
+        
+        if (response.ok) {
+            showToast(`Saved ${currentTeam.name} XI to Cloud ☁️!`);
+        } else {
+            showToast("Failed to connect to Cloud Database.");
+        }
+    } catch (error) {
+        console.error("Upstash Save Error:", error);
+        showToast("Network error saving to Cloud.");
+    } finally {
+        // Reset icon back to floppy disk
+        saveXiBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i>';
+    }
 }
 
-function loadXI() {
+async function loadXI() {
     if (!currentTeam) return;
-    const saved = localStorage.getItem(`savedXI_${currentTeam.id}`);
-    if (saved) {
-        try {
-            const playerIds = JSON.parse(saved);
-            playingXI = [];
-            playerIds.forEach(id => {
-                const p = squad.find(player => player.id === id);
-                if (p) playingXI.push(p);
-            });
-            showToast(`Loaded saved XI for ${currentTeam.name}`);
-            playerSearch.value = '';
-            renderSquad();
-            renderPlayingXI();
-            updateStats();
-        } catch (e) {
-             console.error("Error loading saved XI", e);
-             showToast("Error loading saved XI!");
+    const key = `ipl_xi_builder_${currentTeam.id}`;
+    
+    try {
+        loadXiBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+        
+        const response = await fetch(`${UPSTASH_URL}/get/${key}`, {
+            headers: {
+                Authorization: `Bearer ${UPSTASH_TOKEN}`
+            }
+        });
+        const data = await response.json();
+        
+        if (data.result) {
+            let playerIds;
+            try {
+                playerIds = typeof data.result === 'string' ? JSON.parse(data.result) : data.result;
+            } catch (e) {
+                playerIds = null;
+            }
+            
+            if (playerIds && Array.isArray(playerIds)) {
+                playingXI = [];
+                playerIds.forEach(id => {
+                    const p = squad.find(player => player.id === id);
+                    if (p) playingXI.push(p);
+                });
+                renderSquad(playerSearch.value);
+                renderPlayingXI();
+                updateStats();
+                showToast(`Loaded ${currentTeam.name} XI from Cloud ☁️!`);
+            } else {
+                showToast("Corrupted XI found in Cloud.");
+            }
+        } else {
+            showToast("No saved XI found in Cloud.");
         }
-    } else {
-        showToast("No saved XI found for this team.");
+    } catch (error) {
+        console.error("Upstash Load Error:", error);
+        showToast("Network error loading from Cloud.");
+    } finally {
+        loadXiBtn.innerHTML = '<i class="fa-solid fa-folder-open"></i>';
     }
 }
 
