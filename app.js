@@ -23,12 +23,14 @@ const saveXiBtn = document.getElementById('save-xi-btn');
 const loadXiBtn = document.getElementById('load-xi-btn');
 const compareBtn = document.getElementById('compare-btn');
 const comparePanel = document.getElementById('compare-panel');
+const viewToggleBtn = document.getElementById('view-toggle-btn');
 
 // Upstash Redis Credentials
 const UPSTASH_URL = "https://legal-quail-68667.upstash.io";
 const UPSTASH_TOKEN = "gQAAAAAAAQw7AAIncDE0OTRkN2Y3ZDE5YWM0YzYxOWQyNWI4YzViMjgzNjRjYnAxNjg2Njc";
 
 let isCompareMode = false;
+let isPitchListView = false;
 
 // Initialization
 function init() {
@@ -39,6 +41,23 @@ function init() {
     saveXiBtn.addEventListener('click', saveXI);
     loadXiBtn.addEventListener('click', loadXI);
     if(compareBtn) compareBtn.addEventListener('click', toggleCompareMode);
+    if(viewToggleBtn) viewToggleBtn.addEventListener('click', togglePitchView);
+}
+
+function togglePitchView() {
+    isPitchListView = !isPitchListView;
+    const playingXi = document.getElementById('playing-xi');
+    const compareXi = document.getElementById('compare-playing-xi');
+    
+    if (isPitchListView) {
+        if(playingXi) playingXi.classList.add('list-view');
+        if(compareXi) compareXi.classList.add('list-view');
+        viewToggleBtn.innerHTML = '<i class="fa-solid fa-grip"></i>';
+    } else {
+        if(playingXi) playingXi.classList.remove('list-view');
+        if(compareXi) compareXi.classList.remove('list-view');
+        viewToggleBtn.innerHTML = '<i class="fa-solid fa-list"></i>';
+    }
 }
 
 

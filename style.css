@@ -462,10 +462,52 @@ h1 {
 .pitch.drag-over {
     border-color: var(--success-color);
     background: rgba(0, 204, 102, 0.05);
+    box-shadow: 0 0 15px rgba(0, 204, 102, 0.2);
 }
 
-/* Card actions removed */
+/* Pitch List View Overrides */
+.pitch.list-view {
+    display: block;
+    padding: 10px;
+    background: transparent;
+    border: none;
+}
 
+.pitch.list-view .pitch-row {
+    display: block;
+    margin: 0;
+}
+
+.pitch.list-view .pitch-slot {
+    display: block;
+    width: 100%;
+    min-height: auto;
+    border: none;
+    background: transparent;
+    margin-bottom: 5px;
+}
+
+.pitch.list-view .impact-slot {
+    border-top: 1px dashed rgba(255,255,255,0.2) !important;
+    padding-top: 10px;
+    margin-top: 10px;
+}
+
+.pitch.list-view .impact-slot .slot-label {
+    position: static;
+    transform: none;
+    display: inline-block;
+    margin-bottom: 5px;
+    background: transparent;
+    border: 1px dashed rgba(255,255,255,0.3);
+}
+
+.pitch.list-view .team-xi-card, .pitch.list-view .player-card {
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 8px 12px;
+}
 /* Toast Notification */
 .toast-container {
     position: absolute;
