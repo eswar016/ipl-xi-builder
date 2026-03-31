@@ -1,7 +1,7 @@
 // State Management
 let currentTeam = null;
 let squad = [];
-let playingXI = [];
+let playingXI = new Array(12).fill(null);
 
 // DOM Elements
 const teamSelector = document.getElementById('team-selector');
@@ -112,7 +112,7 @@ function handleTeamSelection(e) {
 
     // Reset State
     squad = [...currentTeam.players];
-    playingXI = [];
+    playingXI = new Array(12).fill(null);
     playerSearch.value = '';
     
     renderSquad();
@@ -142,9 +142,11 @@ function createPlayerCard(player, isPitchCard = false, overrideColor = null) {
     const roleIcons = getRoleIcon(player.role);
     
     const accentColor = overrideColor || 'var(--team-theme)';
+    const removeBtn = isPitchCard ? `<button class="remove-player-btn" onclick="removePlayerFromXI('${player.id}')" title="Remove Player"><i class="fa-solid fa-xmark"></i></button>` : '';
 
     card.innerHTML = `
         <div class="card-accent" style="background: ${accentColor};"></div>
+        ${removeBtn}
         <div class="player-info">
             <div class="player-name">
                 ${player.name}
@@ -173,7 +175,7 @@ function renderSquad(searchQuery = '') {
     }
 
     // Filter out players already in playing XI
-    let availableSquad = squad.filter(p => !playingXI.find(xi => xi.id === p.id));
+    let availableSquad = squad.filter(p => !playingXI.find(xi => xi && xi.id === p.id));
     
     // Apply search filter
     if (searchQuery) {
@@ -246,8 +248,9 @@ function renderPlayingXI() {
 
 // Updating stats and applying validations
 function updateStats() {
-    const totalCount = playingXI.length;
-    const osCount = playingXI.filter(p => p.isOverseas).length;
+    const activePlayers = playingXI.filter(p => p !== null);
+    const totalCount = activePlayers.length;
+    const osCount = activePlayers.filter(p => p.isOverseas).length;
 
     xiCountSpan.textContent = totalCount;
     osCountSpan.textContent = osCount;
@@ -314,15 +317,15 @@ function drop(e) {
 
     // Handle swapping WITHIN the playing XI
     if (sourceContainerId === 'playing-xi' && targetContainerId === 'playing-xi') {
-        const dropTargetCard = e.target.closest('.player-card'); // Card we dropped ON
-        if (dropTargetCard && dropTargetCard.dataset.id !== draggedPlayerId) {
-            const idx1 = playingXI.findIndex(p => p.id === draggedPlayerId);
-            const idx2 = playingXI.findIndex(p => p.id === dropTargetCard.dataset.id);
-            if (idx1 !== -1 && idx2 !== -1) {
+        const targetSlot = e.target.closest('.pitch-slot');
+        if (targetSlot) {
+            const targetIndex = parseInt(targetSlot.dataset.index);
+            const draggedIndex = playingXI.findIndex(p => p && p.id === draggedPlayerId);
+            if (draggedIndex !== -1 && targetIndex !== -1) {
                 // Swap in array
-                const temp = playingXI[idx1];
-                playingXI[idx1] = playingXI[idx2];
-                playingXI[idx2] = temp;
+                const temp = playingXI[draggedIndex];
+                playingXI[draggedIndex] = playingXI[targetIndex];
+                playingXI[targetIndex] = temp;
                 renderPlayingXI();
             }
         }
@@ -335,7 +338,19 @@ function drop(e) {
     if (targetContainerId === 'playing-xi' && sourceContainerId === 'available-players') {
         const player = squad.find(p => p.id === draggedPlayerId);
         if (canAddToXI(player)) {
-            playingXI.push(player);
+            let targetIndex = -1;
+            const targetSlot = e.target.closest('.pitch-slot');
+            if (targetSlot) {
+                targetIndex = parseInt(targetSlot.dataset.index);
+            }
+
+            if (targetIndex !== -1 && !playingXI[targetIndex]) {
+                playingXI[targetIndex] = player;
+            } else {
+                const emptyIdx = playingXI.findIndex(p => p === null);
+                if (emptyIdx !== -1) playingXI[emptyIdx] = player;
+            }
+
             renderSquad(playerSearch.value);
             renderPlayingXI();
             updateStats();
@@ -343,7 +358,8 @@ function drop(e) {
     } 
     // Moving from Pitch to Squad
     else if (targetContainerId === 'available-players' && sourceContainerId === 'playing-xi') {
-        playingXI = playingXI.filter(p => p.id !== draggedPlayerId);
+        const idx = playingXI.findIndex(p => p && p.id === draggedPlayerId);
+        if (idx !== -1) playingXI[idx] = null;
         renderSquad(playerSearch.value);
         renderPlayingXI();
         updateStats();
@@ -352,13 +368,14 @@ function drop(e) {
 
 // Logic Validation
 function canAddToXI(player) {
-    if (playingXI.length >= 12) {
+    const activePlayers = playingXI.filter(p => p !== null);
+    if (activePlayers.length >= 12) {
         showToast("Maximum 12 players allowed (11 Playing XI + 1 Impact).");
         return false;
     }
     
     if (player.isOverseas) {
-        const osCount = playingXI.filter(p => p.isOverseas).length;
+        const osCount = activePlayers.filter(p => p.isOverseas).length;
         if (osCount >= 4) {
             showToast("Maximum 4 overseas players allowed.");
             return false;
@@ -384,19 +401,22 @@ function showToast(message) {
 // Roles toggle logic removed
 
 function clearXI() {
-    playingXI = [];
+    playingXI = new Array(12).fill(null);
     renderSquad(playerSearch.value);
     renderPlayingXI();
     updateStats();
 }
 
 async function saveXI() {
-    if (!currentTeam || playingXI.length === 0) {
+    const activePlayers = playingXI.filter(p => p !== null);
+    if (!currentTeam || activePlayers.length === 0) {
         showToast("Nothing to save!");
         return;
     }
     
-    const playerIds = playingXI.map(p => p.id);
+    // We want to save the exact structure including nulls so order is preserved
+    // so we map over all of playingXI
+    const playerIds = playingXI.map(p => p ? p.id : null);
     const key = `ipl_xi_builder_${currentTeam.id}`;
     
     try {
@@ -447,10 +467,12 @@ async function loadXI() {
             }
             
             if (playerIds && Array.isArray(playerIds)) {
-                playingXI = [];
-                playerIds.forEach(id => {
-                    const p = squad.find(player => player.id === id);
-                    if (p) playingXI.push(p);
+                playingXI = new Array(12).fill(null);
+                playerIds.forEach((id, index) => {
+                    if (id && index < 12) {
+                        const p = squad.find(player => player.id === id);
+                        if (p) playingXI[index] = p;
+                    }
                 });
                 renderSquad(playerSearch.value);
                 renderPlayingXI();
@@ -476,7 +498,7 @@ function toggleCompareMode() {
     if (isCompareMode) {
         workspace.classList.add('compare-active');
         comparePanel.style.display = 'flex';
-        if (currentTeam && playingXI.length > 0) saveXI();
+        if (currentTeam && playingXI.filter(p => p !== null).length > 0) saveXI();
         renderCompareXI();
         compareBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
         showToast("Compare mode active! Select another team to build.");
@@ -491,7 +513,7 @@ function renderCompareXI() {
     const compareContainer = document.getElementById('compare-playing-xi');
     const compareName = document.getElementById('compare-team-name');
     
-    if (!currentTeam || playingXI.length === 0) {
+    if (!currentTeam || playingXI.filter(p => p !== null).length === 0) {
         compareContainer.innerHTML = '<div class="empty-pitch-state"><i class="fa-solid fa-code-compare icon-large"></i><p>No XI frozen.</p></div>';
         compareName.textContent = "Compare XI";
         return;
@@ -537,6 +559,15 @@ function renderCompareXI() {
     compareContainer.appendChild(row3);
 }
 
+window.removePlayerFromXI = function(playerId) {
+    const idx = playingXI.findIndex(p => p && p.id === String(playerId));
+    if (idx !== -1) {
+        playingXI[idx] = null;
+        renderSquad(playerSearch.value);
+        renderPlayingXI();
+        updateStats();
+    }
+};
+
 // Initialize on Load
 document.addEventListener('DOMContentLoaded', init);
-
