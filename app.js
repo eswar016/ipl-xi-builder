@@ -135,6 +135,8 @@ function createPlayerCard(player, isPitchCard = false, overrideColor = null) {
     
     card.addEventListener('dragstart', dragStart);
     card.addEventListener('dragend', dragEnd);
+    card.addEventListener('dragover', allowDrop);
+    card.addEventListener('drop', drop);
 
     // Build the inner HTML
     const overseasIcon = player.isOverseas ? '<span class="globe-icon" title="Overseas Player">✈️</span>' : '';
@@ -221,6 +223,9 @@ function renderPlayingXI() {
     for (let i = 0; i < 12; i++) {
         const slot = document.createElement('div');
         slot.className = 'pitch-slot';
+        slot.dataset.index = i;
+        slot.addEventListener('dragover', allowDrop);
+        slot.addEventListener('drop', drop);
         
         let label = '';
         if (i === 11) {
@@ -292,6 +297,7 @@ function dragEnd(e) {
 
 function allowDrop(e) {
     e.preventDefault();
+    e.stopPropagation();
     if(e.currentTarget.classList) {
         e.currentTarget.classList.add('drag-over');
     }
@@ -299,6 +305,7 @@ function allowDrop(e) {
 
 function drop(e) {
     e.preventDefault();
+    e.stopPropagation();
     const targetNode = e.currentTarget;
     const isTargetPitch = e.currentTarget.closest('.pitch') !== null || e.target.closest('.pitch') !== null;
     const isTargetSquad = e.currentTarget.closest('.squad-panel') !== null || e.target.closest('.squad-panel') !== null;
@@ -317,7 +324,7 @@ function drop(e) {
 
     // Handle swapping WITHIN the playing XI
     if (sourceContainerId === 'playing-xi' && targetContainerId === 'playing-xi') {
-        const targetSlot = e.target.closest('.pitch-slot');
+        const targetSlot = e.currentTarget.closest('.pitch-slot') || e.target.closest('.pitch-slot');
         if (targetSlot) {
             const targetIndex = parseInt(targetSlot.dataset.index, 10);
             const draggedIndex = playingXI.findIndex(p => p && p.id === draggedPlayerId);
@@ -339,7 +346,7 @@ function drop(e) {
         const player = squad.find(p => p.id === draggedPlayerId);
         if (canAddToXI(player)) {
             let targetIndex = -1;
-            const targetSlot = e.target.closest('.pitch-slot');
+            const targetSlot = e.currentTarget.closest('.pitch-slot') || e.target.closest('.pitch-slot');
             if (targetSlot && targetSlot.dataset.index !== undefined) {
                 targetIndex = parseInt(targetSlot.dataset.index, 10);
             }
