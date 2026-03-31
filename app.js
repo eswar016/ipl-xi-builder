@@ -319,9 +319,9 @@ function drop(e) {
     if (sourceContainerId === 'playing-xi' && targetContainerId === 'playing-xi') {
         const targetSlot = e.target.closest('.pitch-slot');
         if (targetSlot) {
-            const targetIndex = parseInt(targetSlot.dataset.index);
+            const targetIndex = parseInt(targetSlot.dataset.index, 10);
             const draggedIndex = playingXI.findIndex(p => p && p.id === draggedPlayerId);
-            if (draggedIndex !== -1 && targetIndex !== -1) {
+            if (draggedIndex !== -1 && !isNaN(targetIndex) && targetIndex >= 0 && targetIndex < 12) {
                 // Swap in array
                 const temp = playingXI[draggedIndex];
                 playingXI[draggedIndex] = playingXI[targetIndex];
@@ -340,11 +340,11 @@ function drop(e) {
         if (canAddToXI(player)) {
             let targetIndex = -1;
             const targetSlot = e.target.closest('.pitch-slot');
-            if (targetSlot) {
-                targetIndex = parseInt(targetSlot.dataset.index);
+            if (targetSlot && targetSlot.dataset.index !== undefined) {
+                targetIndex = parseInt(targetSlot.dataset.index, 10);
             }
 
-            if (targetIndex !== -1 && !playingXI[targetIndex]) {
+            if (!isNaN(targetIndex) && targetIndex >= 0 && targetIndex < 12 && !playingXI[targetIndex]) {
                 playingXI[targetIndex] = player;
             } else {
                 const emptyIdx = playingXI.findIndex(p => p === null);
