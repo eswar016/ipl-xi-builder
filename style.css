@@ -479,18 +479,21 @@ h1 {
 }
 
 .pitch.list-view .pitch-slot {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     width: 100%;
-    min-height: auto;
-    border: none;
-    background: transparent;
-    margin-bottom: 5px;
+    min-height: 52px;
+    border: 2px dashed rgba(255, 255, 255, 0.15);
+    background: rgba(0, 0, 0, 0.1);
+    margin-bottom: 8px;
+    border-radius: var(--card-radius);
+    padding: 2px;
 }
 
 .pitch.list-view .impact-slot {
-    border-top: 1px dashed rgba(255,255,255,0.2) !important;
-    padding-top: 10px;
-    margin-top: 10px;
+    border-color: rgba(255,255,255,0.3) !important;
+    margin-top: 15px;
 }
 
 .pitch.list-view .impact-slot .slot-label {
